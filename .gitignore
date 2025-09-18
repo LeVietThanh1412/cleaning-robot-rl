@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+
+# Virtual environment
+cleaningRobot/
+venv/
+env/
+.env
+
+# VSCode
+.vscode/
+
+# Checkpoints, model weights
+*.pth
+*.pt
+
+# Logs
+*.log
+training_rewards.txt
+
+# Jupyter Notebook
+.ipynb_checkpoints/
