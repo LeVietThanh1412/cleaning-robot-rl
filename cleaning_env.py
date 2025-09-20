@@ -1,6 +1,7 @@
+import gymnasium as gym
 import numpy as np
-import gym
-from gym import spaces
+import numpy as np
+from gymnasium import spaces
 import random
 from heapq import heappop, heappush
 
@@ -9,11 +10,15 @@ class CleaningRobotEnv(gym.Env):
         super(CleaningRobotEnv, self).__init__()
         self.grid_size = 6
         self.num_obstacles = 6  
-        self.action_space = spaces.Discrete(4)  
+        self.action_space = spaces.Discrete(4)
         self.observation_space = spaces.Box(low=0, high=1, shape=(self.grid_size, self.grid_size), dtype=np.int32)
         self.reset()
 
-    def reset(self):
+    def reset(self, seed=None, options=None):
+        if seed is not None:
+            random.seed(seed)
+            np.random.seed(seed)
+            
         while True:
             self.grid = np.zeros((self.grid_size, self.grid_size), dtype=np.int32)
             self.robot_pos = [random.randint(0, self.grid_size - 1), random.randint(0, self.grid_size - 1)]
@@ -30,7 +35,7 @@ class CleaningRobotEnv(gym.Env):
                 break  
     
         self.cleaned_cells = set()
-        return self.grid
+        return self.grid, {}
 
     def _is_valid_env(self):
         """Kiểm tra môi trường có bị cô lập không (BFS)."""
@@ -60,12 +65,12 @@ class CleaningRobotEnv(gym.Env):
             self.cleaned_cells.add(new_pos)
     
         reward = 10 if is_new_cell else -1
-        done = len(self.cleaned_cells) == (self.grid_size * self.grid_size - self.num_obstacles)
-        if done:
+        terminated = len(self.cleaned_cells) == (self.grid_size * self.grid_size - self.num_obstacles)
+        if terminated:
             reward += 500
     
         print(f"Robot tại {self.robot_pos}, Reward: {reward}, Ô đã quét: {len(self.cleaned_cells)}/{self.grid_size * self.grid_size - self.num_obstacles}")
-        return self.grid, reward, done, {}
+        return self.grid, reward, terminated, False, {}
 
     def _a_star_find_next_move(self):
         """Dùng A* để tìm đường đến ô chưa quét gần nhất."""
