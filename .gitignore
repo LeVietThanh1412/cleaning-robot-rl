@@ -6,6 +6,7 @@ __pycache__/
 
 # Virtual environment
 cleaningRobot/
+cleaningRobot2/
 venv/
 env/
 .env
