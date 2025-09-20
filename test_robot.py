@@ -49,7 +49,7 @@ pygame.display.set_caption("Cleaning Robot Visualization")
 clock = pygame.time.Clock()
 
 done = False
-obs = env.reset()
+obs, _ = env.reset()  # Unpack tuple (obs, info)
 score = 0
 
 while True:
@@ -59,7 +59,8 @@ while True:
             exit()
 
     action, _ = model.predict(obs, deterministic=True)
-    obs, reward, done, _ = env.step(action)
+    obs, reward, terminated, truncated, _ = env.step(action)  # Unpack 5 values
+    done = terminated or truncated
     score += reward
 
     draw_grid(screen, env, score)
@@ -67,6 +68,6 @@ while True:
 
     if done:
         pygame.time.delay(1000)  # Dừng 1s trước khi reset
-        obs = env.reset()
+        obs, _ = env.reset()  # Unpack tuple (obs, info)
         score = 0
         done = False  # Reset trạng thái

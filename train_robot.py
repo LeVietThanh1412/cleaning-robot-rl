@@ -5,7 +5,7 @@ from stable_baselines3 import PPO
 from cleaning_env import CleaningRobotEnv
 
 def print_banner():
-    """In banner ngầu cho chương trình"""
+    """In banner cho chương trình"""
     print("\n" + "="*60)
     print("🤖 CLEANING ROBOT AI TRAINING SYSTEM 🤖")
     print("="*60)
@@ -15,7 +15,7 @@ def print_banner():
     print("="*60 + "\n")
 
 def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=50, fill='█'):
-    """In thanh tiến trình ngầu"""
+    """In thanh tiến trình với thông tin"""
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filled_length = int(length * iteration // total)
     bar = fill * filled_length + '-' * (length - filled_length)
@@ -25,14 +25,15 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
 
 def train_episode(model, env, episode_num):
     """Huấn luyện một episode và trả về reward"""
-    obs = env.reset()
+    obs, _ = env.reset()
     episode_rewards = []
     steps = 0
     
     done = False
     while not done:
         action, _ = model.predict(obs, deterministic=True)
-        obs, reward, done, _ = env.step(action)
+        obs, reward, terminated, truncated, _ = env.step(action)
+        done = terminated or truncated
         episode_rewards.append(reward)
         steps += 1
     
@@ -47,7 +48,7 @@ env = CleaningRobotEnv()
 print("✅ Environment loaded successfully!")
 
 print("🧠 Creating PPO Neural Network...")
-model = PPO("MlpPolicy", env, verbose=0)
+model = PPO("MlpPolicy", env, verbose=0, device='cpu')
 print("✅ AI Model initialized!")
 
 print("\n🎮 Starting Training Sequence...")
@@ -55,7 +56,7 @@ print("-" * 60)
 
 # Cấu hình training
 rewards = []
-TIMESTEPS = 100000
+TIMESTEPS = 10000
 TRAINING_ROUNDS = 10
 STEPS_PER_ROUND = TIMESTEPS // TRAINING_ROUNDS
 
